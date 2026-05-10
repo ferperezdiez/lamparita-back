@@ -11,6 +11,10 @@ No respondas nada más. Solo "on" o "off".`;
  * @returns {Promise<"on" | "off">}
  */
 export async function decideLightCommand(prompt) {
+  if (!config.groqApiKey) {
+    throw new Error('Falta configurar GROQ_API_KEY en el backend');
+  }
+
   const response = await fetch(`${config.groqBaseUrl}/chat/completions`, {
     method: 'POST',
     headers: {
