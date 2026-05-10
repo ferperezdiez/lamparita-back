@@ -13,7 +13,7 @@ function parseCommand(value) {
   return command === 'on' || command === 'off' ? command : null;
 }
 
-export function createApp() {
+export  default function createApp() {
   const app = express();
   const api = express.Router();
 
