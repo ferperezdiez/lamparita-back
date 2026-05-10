@@ -1,7 +1,17 @@
 const REQUIRED_ENV_VARS = ['HIVEMQ_HOST', 'HIVEMQ_USERNAME', 'HIVEMQ_PASSWORD'];
 
+function hasGroqApiKey(env) {
+  return Boolean(env.GROQ_API_KEY);
+}
+
 function getMissingEnvVars(env) {
-  return REQUIRED_ENV_VARS.filter((key) => !env[key]);
+  const missingEnvVars = REQUIRED_ENV_VARS.filter((key) => !env[key]);
+
+  if (!hasGroqApiKey(env)) {
+    missingEnvVars.push('GROQ_API_KEY');
+  }
+
+  return missingEnvVars;
 }
 
 function normalizeBasePath(value) {
@@ -40,6 +50,9 @@ export function getConfig(env = process.env) {
       // En producción suele ser true, en local false si usás certificados auto-firmados
       rejectUnauthorized: env.HIVEMQ_REJECT_UNAUTHORIZED !== 'false',
     },
+    groqApiKey: env.GROQ_API_KEY,
+    groqModel: env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+    groqBaseUrl: env.GROQ_BASE_URL || 'https://api.groq.com/openai/v1',
   };
 }
 

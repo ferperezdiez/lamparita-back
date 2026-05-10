@@ -2,6 +2,7 @@ import cors from 'cors';
 import express from 'express';
 
 import config from './config.js';
+import { decideLightCommand } from './groq.js';
 import { publishCommand } from './mqttClient.js';
 
 function parseCommand(value) {
@@ -42,6 +43,39 @@ export function createApp() {
       });
     }
   });
+  api.post('/prompt', async (req, res) => {
+    const text = req.body?.text;
+
+    if (typeof text !== 'string' || !text.trim()) {
+      return res.status(400).json({ error: 'El campo "text" es requerido' });
+    }
+
+    let command;
+    try {
+      command = await decideLightCommand(text.trim());
+    } catch (err) {
+      console.error(err);
+      return res.status(502).json({
+        error: 'Error al interpretar el prompt con Groq',
+        detail: String(err?.message || err),
+      });
+    }
+
+    try {
+      await publishCommand(command);
+      return res.json({ ok: true, command, topic: config.mqtt.topic });
+    } catch (err) {
+      console.error(err);
+      return res.status(502).json({
+        error: 'No se pudo publicar en HiveMQ',
+        detail: String(err?.message || err),
+      });
+    }
+  });
+
+  app.get('/', (req, res) => {
+  res.json({ status: 'ok', message: 'Backend de Lamparita funcionando' });
+});
 
   app.get('/health', (_req, res) => {
     res.json({ ok: true });
