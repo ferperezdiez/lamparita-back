@@ -1,7 +1,7 @@
 import 'dotenv/config';
 
 import { createApp } from './app.js';
-import { config } from './config.js';
+import config from './config.js';
 
 const app = createApp();
 

@@ -1,7 +1,7 @@
 import cors from 'cors';
 import express from 'express';
 
-import { config } from './config.js';
+import config from './config.js';
 import { publishCommand } from './mqttClient.js';
 
 function parseCommand(value) {
@@ -13,7 +13,7 @@ function parseCommand(value) {
   return command === 'on' || command === 'off' ? command : null;
 }
 
-export  default function createApp() {
+export function createApp() {
   const app = express();
   const api = express.Router();
 
@@ -50,3 +50,5 @@ export  default function createApp() {
 
   return app;
 }
+
+export default createApp;
