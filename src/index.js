@@ -5,8 +5,10 @@ import { config } from './config.js';
 
 const app = createApp();
 
-app.listen(config.port, () => {
-  console.log(`API en http://localhost:${config.port}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(config.port, () => {
+    console.log(`API en http://localhost:${config.port}${config.basePath}`);
+  });
+}
 
-module.exports = app;
+export default app;

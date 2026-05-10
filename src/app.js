@@ -15,15 +15,16 @@ function parseCommand(value) {
 
 export function createApp() {
   const app = express();
+  const api = express.Router();
 
   app.use(cors());
   app.use(express.json());
 
-  app.get('/health', (_req, res) => {
+  api.get('/health', (_req, res) => {
     res.json({ ok: true });
   });
 
-  app.post('/api/command', async (req, res) => {
+  api.post('/command', async (req, res) => {
     const command = parseCommand(req.body?.command);
 
     if (!command) {
@@ -41,6 +42,11 @@ export function createApp() {
       });
     }
   });
+
+  app.get('/health', (_req, res) => {
+    res.json({ ok: true });
+  });
+  app.use(config.basePath, api);
 
   return app;
 }

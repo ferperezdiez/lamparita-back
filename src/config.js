@@ -4,7 +4,17 @@ function getMissingEnvVars(env) {
   return REQUIRED_ENV_VARS.filter((key) => !env[key]);
 }
 
-function getConfig(env = process.env) {
+function normalizeBasePath(value) {
+  const path = value?.trim() || '/api';
+
+  if (path === '/') {
+    return path;
+  }
+
+  return `/${path.replace(/^\/+|\/+$/g, '')}`;
+}
+
+export function getConfig(env = process.env) {
   const missingEnvVars = getMissingEnvVars(env);
 
   // Solo lanzamos error si no estamos en Vercel (producción)
@@ -20,6 +30,7 @@ function getConfig(env = process.env) {
   return {
     // Vercel asigna el puerto automáticamente, por eso priorizamos process.env.PORT
     port: Number(env.PORT) || 3000,
+    basePath: normalizeBasePath(env.BACKEND_BASE_PATH),
     isProduction: env.NODE_ENV === 'production',
     mqtt: {
       host: env.HIVEMQ_HOST,
@@ -45,6 +56,4 @@ function loadConfig() {
   }
 }
 
-const config = loadConfig();
-
-module.exports = { config, getConfig };
+export const config = loadConfig();
